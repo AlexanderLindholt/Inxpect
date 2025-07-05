@@ -20,7 +20,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.1.1
+v1.2.0
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and plugin cross-communication.
@@ -95,14 +95,19 @@ local function isPublicProperty(member)
 	
 	local security = member.Security
 	if security ~= "None" then
-		if (security.Read and security.Read ~= "None") or (security.Write and security.Write ~= "None") then return end
+		if (security.Read and security.Read ~= "None") or
+			(security.Write and security.Write ~= "None") then
+			return
+		end
 	end
+	
 	if member.Tags then
 		for _, tag in member.Tags do
 			if readOnlyTags[tag] then return end
 		end
 	end
-	return member.ValueType ~= nil
+	
+	if member.ValueType ~= nil then return true end
 end
 local function translateType(valueType)
 	return if valueType.Category == "Class" then
@@ -113,13 +118,13 @@ local function translateType(valueType)
 		types[valueType.Name] or valueType.Name
 end
 
-
+-- Attempt to find the plugin object. Used to check for plugin context.
 local plugin = script:FindFirstAncestorOfClass("Plugin")
 
--- Map builder function.
+-- API map builder function.
 local function buildMap()
 	-- Let the other plugins know that we're building the map.
-	if plugin then workspace:SetAttribute("MapCache", true) end
+	if plugin then workspace:SetAttribute("APIMapCache", true) end
 	
 	-- Grab the latest Roblox API dump from GitHub.
 	local apiDump = HttpService:JSONDecode(
@@ -137,6 +142,7 @@ local function buildMap()
 	end
 	for _, class in apiDump.Classes do
 		if not (class.Tags and class.Tags.NotCreatable) then
+			-- The current class' properties table.
 			local properties = {}
 			
 			-- Gather superclasses.
@@ -156,7 +162,7 @@ local function buildMap()
 				end
 			end
 			
-			-- Own properties.
+			-- Add local properties.
 			for _, member in class.Members do
 				if isPublicProperty(member) then
 					properties[member.Name] = translateType(member.ValueType)
@@ -169,7 +175,7 @@ local function buildMap()
 	end
 	
 	-- Cache map.
-	if plugin then workspace:SetAttribute("MapCache", HttpService:JSONEncode(map)) end
+	if plugin then workspace:SetAttribute("APIMapCache", HttpService:JSONEncode(map)) end
 	
 	-- Return map.
 	return map
@@ -177,19 +183,18 @@ end
 
 -- Retrieve/build and return map.
 if plugin then
-	if not RunService:IsRunning() and not StudioService:GetAttribute("MapCached") then
-		StudioService:SetAttribute("MapCached", true)
+	if RunService:IsRunning() then
+		return HttpService:JSONDecode(workspace:GetAttribute("APIMapCache"))
+	elseif not StudioService:GetAttribute("APIMapCache") then
+		StudioService:SetAttribute("APIMapCache", true)
 		return buildMap() :: Map
 	else
-		local map = workspace:GetAttribute("MapCache")
+		local map = workspace:GetAttribute("APIMapCache")
 		if map then
 			if map == true then
 				-- Another plugin is building the map, so we wait for it to finish.
-				while true do
-					task.wait()
-					map = workspace:GetAttribute("MapCache")
-					if map ~= true then break end
-				end
+				workspace:GetAttributeChangedSignal("APIMapCache"):Wait()
+				map = workspace:GetAttribute("APIMapCache")
 			end
 			return HttpService:JSONDecode(map) :: Map
 		else
