@@ -13,7 +13,7 @@ with plugin support and plugin cross-communication.
 <br>
 
 #  🥷 The hidden Roblox API
-On Roblox there is not built-in way to view the API
+On Roblox there is not built-in way to view the API<br>
 and e.g. see which properties a certain instance has.
 
 Inxpect allows you to easily inspect what was previously hidden.
