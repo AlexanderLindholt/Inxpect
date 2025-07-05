@@ -15,6 +15,7 @@ with plugin support and plugin cross-communication.
 # ✨ Fast, easy, smart.
 It's super efficient, and communicates with copies of itself<br>
 from other plugins, ensuring only one plugin does the hard job.
+
 <br>
 
 Additionally, the syntax can't get any simpler!
