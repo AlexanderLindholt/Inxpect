@@ -64,8 +64,8 @@ local StudioService = game:GetService("StudioService")
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
--- Property map type.
-type PropertyMap = {
+-- Map type.
+type Map = {
 	[string]: {
 		[string]: string
 	}
@@ -130,7 +130,7 @@ local function buildMap()
 	)
 	
 	-- Process data and build map.
-	local propertyMap = {}
+	local map = {}
 	local rawMap = {}
 	for _, class in apiDump.Classes do
 		rawMap[class.Name] = class
@@ -164,38 +164,38 @@ local function buildMap()
 			end
 			
 			-- Add to map.
-			propertyMap[class.Name] = properties
+			map[class.Name] = properties
 		end
 	end
 	
 	-- Cache map.
-	if plugin then workspace:SetAttribute("PropertyMapCache", HttpService:JSONEncode(propertyMap)) end
+	if plugin then workspace:SetAttribute("PropertyMapCache", HttpService:JSONEncode(map)) end
 	
 	-- Return map.
-	return propertyMap
+	return map
 end
 
 -- Retrieve/build and return map.
 if plugin then
-	if not RunService:IsRunning() and not StudioService:GetAttribute("PropertyMapCached") then
-		StudioService:SetAttribute("PropertyMapCached", true)
-		return buildMap() :: PropertyMap
+	if not RunService:IsRunning() and not StudioService:GetAttribute("MapCached") then
+		StudioService:SetAttribute("MapCached", true)
+		return buildMap() :: Map
 	else
-		local propertyMap = workspace:GetAttribute("PropertyMapCache")
-		if propertyMap then
-			if propertyMap == true then
+		local map = workspace:GetAttribute("MapCache")
+		if map then
+			if map == true then
 				-- Another plugin is building the map, so we wait for it to finish.
 				while true do
 					task.wait()
-					propertyMap = workspace:GetAttribute("PropertyMapCache")
-					if propertyMap ~= true then break end
+					map = workspace:GetAttribute("MapCache")
+					if map ~= true then break end
 				end
 			end
-			return HttpService:JSONDecode(propertyMap) :: PropertyMap
+			return HttpService:JSONDecode(map) :: Map
 		else
-			return buildMap() :: PropertyMap
+			return buildMap() :: Map
 		end
 	end
 else
-	return buildMap() :: PropertyMap
+	return buildMap() :: Map
 end
