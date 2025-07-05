@@ -3,7 +3,7 @@
 <img src="./Logo.png"></img>
 
 
-Simple and efficient property map builder for Roblox,<br>
+A super easy and efficient API map builder for Roblox,<br>
 with plugin support and plugin cross-communication.
 
 [<img src="https://raw.githubusercontent.com/AlexanderLindholt/LinkButtons/refs/heads/main/Static/Module.png"></img>](https://create.roblox.com/store/asset/136538514747004) ​ [<img src="https://raw.githubusercontent.com/AlexanderLindholt/LinkButtons/refs/heads/main/Static/Devforum.png"></img>](https://devforum.roblox.com/t/)
