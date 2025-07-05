@@ -20,7 +20,7 @@ from other plugins, ensuring only one plugin does the hard job.
 
 Additionally, the syntax can't get any simpler!
 ```luau
-local properties = require(script.PropertiesMap) -- Inxpect is named 'PropertiesMap' because it makes sense.
+local APIMap = require(script.APIMap) -- Inxpect is named 'APIMap' — since that makes sense.
 ```
 
 <br>
