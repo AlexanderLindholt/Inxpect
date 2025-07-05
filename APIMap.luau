@@ -20,7 +20,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.3.0
+v1.3.1
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and plugin cross-communication.
@@ -70,8 +70,11 @@ They are all needed and work together. Very smart :D
 
 ]]--
 
+-- Attempt to find the plugin object. Used to check for plugin context.
+local plugin = script:FindFirstAncestorOfClass("Plugin")
+
 -- Services.
-local StudioService = game:GetService("StudioService")
+local StudioService = if plugin then game:GetService("StudioService") else nil
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
@@ -128,9 +131,6 @@ local function translateType(valueType)
 		else
 		types[valueType.Name] or valueType.Name
 end
-
--- Attempt to find the plugin object. Used to check for plugin context.
-local plugin = script:FindFirstAncestorOfClass("Plugin")
 
 -- API map builder function.
 local function buildMap()
