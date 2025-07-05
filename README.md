@@ -45,160 +45,233 @@ Don't worry, it provides only what's important:
 	}
 }
 ```
+
 <br>
 
-# 💡Example:
+> [!note]
+> LocalScripts shouldn't require this module. They should instead request the API map from the server through a RemoteFunction.
+
+<br>
+
+# 💡 Example:
 ```luau
-local apiMap = require(script.APIMap) -- 'APIMap' is Inxpect
+local apiMap = require(script.APIMap) -- 'APIMap' is Inxpect.
 
-local partProperties = apiMap["Part"]
-
-local output = "Part:"
-
-for propertyName, propertyType in partProperties do
-	output ..=
-	"\n    Property: "..propertyName..
-	"\n        Type: "..propertyType
+local function printProperties(class)
+	local properties = apiMap[class]
+	
+	local output = class.."'s properties:"
+	for propertyName, propertyType in properties do
+		output ..=
+			"\n\n    Name: "..propertyName..
+			"\n    Type: "..propertyType
+	end
+	print(output)
 end
-
-print(output)
+printProperties("Part")
 ```
 <details>
 <summary>💡 See output</summary>
 
 ```
-Part:
-    Property: RightParamB
-	Type: number
-    Property: CFrame
-	Type: CFrame
-    Property: RightSurface
-	Type: Enum.SurfaceType
-    Property: archivable
-	Type: boolean
-    Property: Friction
-	Type: number
-    Property: FrontParamB
-	Type: number
-    Property: BottomSurface
-	Type: Enum.SurfaceType
-    Property: CollisionGroup
-	Type: string
-    Property: BackSurfaceInput
-	Type: Enum.InputType
-    Property: AssemblyLinearVelocity
-	Type: Vector3
-    Property: Elasticity
-	Type: number
-    Property: FrontParamA
-	Type: number
-    Property: MaterialVariant
-	Type: string
-    Property: RightParamA
-	Type: number
-    Property: Color
-	Type: Color3
-    Property: Massless
-	Type: boolean
-    Property: CollisionGroupId
-	Type: number
-    Property: RotVelocity
-	Type: Vector3
-    Property: Locked
-	Type: boolean
-    Property: Material
-	Type: Enum.Material
-    Property: Size
-	Type: Vector3
-    Property: BackSurface
-	Type: Enum.SurfaceType
-    Property: LocalTransparencyModifier
-	Type: number
-    Property: CustomPhysicalProperties
-	Type: PhysicalProperties
-    Property: Rotation
-	Type: Vector3
-    Property: Name
-	Type: string
-    Property: AudioCanCollide
-	Type: boolean
-    Property: LeftParamA
-	Type: number
-    Property: CastShadow
-	Type: boolean
-    Property: PivotOffset
-	Type: CFrame
-    Property: TopSurfaceInput
-	Type: Enum.InputType
-    Property: Anchored
-	Type: boolean
-    Property: FrontSurfaceInput
-	Type: Enum.InputType
-    Property: BottomParamB
-	Type: number
-    Property: AssemblyAngularVelocity
-	Type: Vector3
-    Property: Capabilities
-	Type: SecurityCapabilities
-    Property: BottomSurfaceInput
-	Type: Enum.InputType
-    Property: CanCollide
-	Type: boolean
-    Property: Sandboxed
-	Type: boolean
-    Property: EnableFluidForces
-	Type: boolean
-    Property: LeftSurface
-	Type: Enum.SurfaceType
-    Property: Transparency
-	Type: number
-    Property: brickColor
-	Type: BrickColor
-    Property: Orientation
-	Type: Vector3
-    Property: LeftSurfaceInput
-	Type: Enum.InputType
-    Property: TopParamA
-	Type: number
-    Property: CanQuery
-	Type: boolean
-    Property: BottomParamA
-	Type: number
-    Property: Archivable
-	Type: boolean
-    Property: Reflectance
-	Type: number
-    Property: formFactor
-	Type: Enum.FormFactor
-    Property: FormFactor
-	Type: Enum.FormFactor
-    Property: RootPriority
-	Type: number
-    Property: BackParamA
-	Type: number
-    Property: Velocity
-	Type: Vector3
-    Property: TopSurface
-	Type: Enum.SurfaceType
-    Property: CanTouch
-	Type: boolean
-    Property: TopParamB
-	Type: number
-    Property: LeftParamB
-	Type: number
-    Property: Parent
-	Type: Instance
-    Property: BrickColor
-	Type: BrickColor
-    Property: FrontSurface
-	Type: Enum.SurfaceType
-    Property: RightSurfaceInput
-	Type: Enum.InputType
-    Property: BackParamB
-	Type: number
-    Property: Shape
-	Type: Enum.PartType
-    Property: Position
-	Type: Vector3
+Part's properties:
+
+    Name: RightParamB
+    Type: number
+
+    Name: CFrame
+    Type: CFrame
+
+    Name: RightSurface
+    Type: Enum.SurfaceType
+
+    Name: archivable
+    Type: boolean
+
+    Name: Friction
+    Type: number
+
+    Name: FrontParamB
+    Type: number
+
+    Name: BottomSurface
+    Type: Enum.SurfaceType
+
+    Name: CollisionGroup
+    Type: string
+
+    Name: BackSurfaceInput
+    Type: Enum.InputType
+
+    Name: AssemblyLinearVelocity
+    Type: Vector3
+
+    Name: Elasticity
+    Type: number
+
+    Name: FrontParamA
+    Type: number
+
+    Name: MaterialVariant
+    Type: string
+
+    Name: RightParamA
+    Type: number
+
+    Name: Color
+    Type: Color3
+
+    Name: Massless
+    Type: boolean
+
+    Name: CollisionGroupId
+    Type: number
+
+    Name: RotVelocity
+    Type: Vector3
+
+    Name: Locked
+    Type: boolean
+
+    Name: Material
+    Type: Enum.Material
+
+    Name: Size
+    Type: Vector3
+
+    Name: BackSurface
+    Type: Enum.SurfaceType
+
+    Name: LocalTransparencyModifier
+    Type: number
+
+    Name: CustomPhysicalProperties
+    Type: PhysicalProperties
+
+    Name: Rotation
+    Type: Vector3
+
+    Name: Name
+    Type: string
+
+    Name: AudioCanCollide
+    Type: boolean
+
+    Name: LeftParamA
+    Type: number
+
+    Name: CastShadow
+    Type: boolean
+
+    Name: PivotOffset
+    Type: CFrame
+
+    Name: TopSurfaceInput
+    Type: Enum.InputType
+
+    Name: Anchored
+    Type: boolean
+
+    Name: FrontSurfaceInput
+    Type: Enum.InputType
+
+    Name: BottomParamB
+    Type: number
+
+    Name: AssemblyAngularVelocity
+    Type: Vector3
+
+    Name: Capabilities
+    Type: SecurityCapabilities
+
+    Name: BottomSurfaceInput
+    Type: Enum.InputType
+
+    Name: CanCollide
+    Type: boolean
+
+    Name: Sandboxed
+    Type: boolean
+
+    Name: EnableFluidForces
+    Type: boolean
+
+    Name: LeftSurface
+    Type: Enum.SurfaceType
+
+    Name: Transparency
+    Type: number
+
+    Name: brickColor
+    Type: BrickColor
+
+    Name: Orientation
+    Type: Vector3
+
+    Name: LeftSurfaceInput
+    Type: Enum.InputType
+
+    Name: TopParamA
+    Type: number
+
+    Name: CanQuery
+    Type: boolean
+
+    Name: BottomParamA
+    Type: number
+
+    Name: Archivable
+    Type: boolean
+
+    Name: Reflectance
+    Type: number
+
+    Name: formFactor
+    Type: Enum.FormFactor
+
+    Name: FormFactor
+    Type: Enum.FormFactor
+
+    Name: RootPriority
+    Type: number
+
+    Name: BackParamA
+    Type: number
+
+    Name: Velocity
+    Type: Vector3
+
+    Name: TopSurface
+    Type: Enum.SurfaceType
+
+    Name: CanTouch
+    Type: boolean
+
+    Name: TopParamB
+    Type: number
+
+    Name: LeftParamB
+    Type: number
+
+    Name: Parent
+    Type: Instance
+
+    Name: BrickColor
+    Type: BrickColor
+
+    Name: FrontSurface
+    Type: Enum.SurfaceType
+
+    Name: RightSurfaceInput
+    Type: Enum.InputType
+
+    Name: BackParamB
+    Type: number
+
+    Name: Shape
+    Type: Enum.PartType
+
+    Name: Position
+    Type: Vector3
 ```
 </details>
