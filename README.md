@@ -16,7 +16,7 @@ with plugin support and plugin cross-communication.
 On Roblox there is not built-in way to view the API<br>
 and e.g. see which properties a certain instance has.
 
-Inxpect allows you to easily inspect what was previously hidden.
+Inxpect allows you to easily inspect what was otherwise hidden.
 
 <br>
 
