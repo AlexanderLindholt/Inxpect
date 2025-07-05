@@ -21,9 +21,13 @@ Inxpect allows you to easily inspect what was otherwise hidden.
 <br>
 
 # ✨ Fast, easy, smart.
-It's super efficient, and communicates with copies of itself<br>
-from other plugins, ensuring only one plugin does the hard job.
+It’s super efficient, easy-to-use, and has full plugin support.
 
+It even works in a plugin while the game is running!<br>
+This is possible due to its intelligent caching.<br>
+
+And when in a plugin, it will communicate with copies of itself<br>
+from other plugins, ensuring only 1 plugin does the hard job.<br>
 <br>
 
 Additionally, the syntax can't get any simpler!
