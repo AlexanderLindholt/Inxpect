@@ -12,10 +12,9 @@ with plugin support and plugin cross-communication.
 ​<br>
 <br>
 
-# ✨ Fast, easy, smart
+# ✨ Fast, easy, smart.
 It's super efficient, and communicates with copies of itself<br>
 from other plugins, ensuring only one plugin does the hard job.
-
 <br>
 
 Additionally, the syntax can't get any simpler!
@@ -24,8 +23,8 @@ local properties = require(script.PropertiesMap) -- Inxpect is named 'Properties
 ```
 
 <br>
-
 Don't worry, it provides only what's important:
+
 ```luau
 {
 	Class (string) = {
