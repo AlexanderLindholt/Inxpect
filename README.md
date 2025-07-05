@@ -45,7 +45,7 @@ Don't worry, it provides only what's important:
 	}
 }
 ```
-
+<br>
 <br>
 
 > [!note]
