@@ -20,7 +20,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.2.0
+v1.3.0
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and plugin cross-communication.
@@ -56,6 +56,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------------------
+
+]]--
+
+--[[
+
+What the different cache locations are for:
+- Workspace: Current game
+- StudioService: Current session (edit mode)
+- Plugin: Current plugin (almost permanent)
+
+They are all needed and work together. Very smart :D
 
 ]]--
 
@@ -123,84 +134,135 @@ local plugin = script:FindFirstAncestorOfClass("Plugin")
 
 -- API map builder function.
 local function buildMap()
-	-- Let the other plugins know that we're building the map.
-	if plugin then workspace:SetAttribute("APIMapCache", true) end
+	-- Let copies of this library know that we're building the map.
+	workspace:SetAttribute("APIMapCache", true)
 	
 	-- Grab the latest Roblox API dump from GitHub.
-	local apiDump = HttpService:JSONDecode(
-		HttpService:GetAsync(
-			"https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/refs/heads/roblox/API-Dump.json",
-			true -- We disable caching because we only request this data once.
-		)
+	local success, apiDump = pcall(HttpService.GetAsync, HttpService,
+		"https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/refs/heads/roblox/API-Dump.json",
+		true -- We disable caching because we only request this data once.
 	)
+	if not success then
+		if plugin then
+			local map = plugin:GetSetting("APIMapCache") -- Grab the map from plugin cache.
+			if map then
+				-- Cache map for current place.
+				workspace:SetAttribute("APIMapCache", map)
+				-- Decode and return map.
+				return HttpService:JSONDecode(map)
+			else
+				map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
+				if not map then
+					-- We hope that a copy of this library has the map cached, and wait for it to provide it.
+					workspace:GetAttributeChangedSignal("APIMapCache"):Wait()
+					
+					-- Grab the map from current place cache.
+					map = workspace:GetAttribute("APIMapCache")
+					-- Cache the map in plugin. 
+					plugin:SetSetting("APIMapCache", map) -- Map is already encoded btw.
+				end
+				-- Decode and return map.
+				return HttpService:JSONDecode(map) :: Map
+			end
+		end
+		return
+	end
 	
-	-- Process data and build map.
+	-- Decode the API dump.
+	apiDump = HttpService:JSONDecode(apiDump)
+	
+	-- Build map.
 	local map = {}
 	local rawMap = {}
 	for _, class in apiDump.Classes do
 		rawMap[class.Name] = class
 	end
 	for _, class in apiDump.Classes do
-		if not (class.Tags and class.Tags.NotCreatable) then
-			-- The current class' properties table.
-			local properties = {}
-			
-			-- Gather superclasses.
-			local superClasses = {}
-			local superClass = rawMap[class.Superclass]
-			while superClass do
-				table.insert(superClasses, superClass)
-				superClass = rawMap[superClass.Superclass]
-			end
-			-- Inherit properties from superclasses.
-			for index = #superClasses, 1, -1 do
-				local superClass = superClasses[index]
-				for _, member in superClass.Members do
-					if isPublicProperty(member) then
-						properties[member.Name] = translateType(member.ValueType)
-					end
-				end
-			end
-			
-			-- Add local properties.
-			for _, member in class.Members do
+		-- Skip classes that are not creatable.
+		if (class.Tags and class.Tags.NotCreatable) then continue end
+		
+		-- The current class's properties table.
+		local properties = {}
+		
+		-- Gather superclasses.
+		local superClasses = {}
+		local superClass = rawMap[class.Superclass]
+		while superClass do
+			table.insert(superClasses, superClass)
+			superClass = rawMap[superClass.Superclass]
+		end
+		-- Inherit properties from superclasses.
+		for index = #superClasses, 1, -1 do
+			local superClass = superClasses[index]
+			for _, member in superClass.Members do
 				if isPublicProperty(member) then
 					properties[member.Name] = translateType(member.ValueType)
 				end
 			end
-			
-			-- Add to map.
-			map[class.Name] = properties
 		end
+		
+		-- Add local properties.
+		for _, member in class.Members do
+			if isPublicProperty(member) then
+				properties[member.Name] = translateType(member.ValueType)
+			end
+		end
+		
+		-- Add to map.
+		map[class.Name] = properties
 	end
 	
 	-- Cache map.
-	if plugin then workspace:SetAttribute("APIMapCache", HttpService:JSONEncode(map)) end
+	local encodedMap = HttpService:JSONEncode(map)
+	workspace:SetAttribute("APIMapCache", encodedMap)
+	if plugin then plugin:SetSetting("APIMapCache", encodedMap) end
 	
 	-- Return map.
 	return map
 end
 
 -- Retrieve/build and return map.
-if plugin then
+if plugin then -- Plugin context.
 	if RunService:IsRunning() then
-		return HttpService:JSONDecode(workspace:GetAttribute("APIMapCache"))
+		-- Grab, decode and return map from current place cache.
+		return HttpService:JSONDecode(workspace:GetAttribute("APIMapCache")) :: Map
 	elseif not StudioService:GetAttribute("APIMapCache") then
+		-- Mark the current session as "has built"
 		StudioService:SetAttribute("APIMapCache", true)
+		-- Build and return map.
 		return buildMap() :: Map
 	else
-		local map = workspace:GetAttribute("APIMapCache")
+		local map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
 		if map then
 			if map == true then
-				-- Another plugin is building the map, so we wait for it to finish.
+				-- A copy of this library is building the map, so we wait for it to finish.
 				workspace:GetAttributeChangedSignal("APIMapCache"):Wait()
+				
+				-- Grab the map from current place cache.
 				map = workspace:GetAttribute("APIMapCache")
+				-- Cache the map in plugin.
+				plugin:SetSetting("APIMapCache", map) -- Map is already encoded btw.
 			end
+			-- Decode and return map.
 			return HttpService:JSONDecode(map) :: Map
 		else
+			-- Build and return map.
 			return buildMap() :: Map
 		end
 	end
-else
-	return buildMap() :: Map
+else -- Game context.
+	local map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
+	if map then
+		if map == true then
+			-- A copy of this library is building the map, so we wait for it to finish.
+			workspace:GetAttributeChangedSignal("APIMapCache"):Wait()
+			-- Grab the map from current place cache.
+			map = workspace:GetAttribute("APIMapCache")
+		end
+		-- Decode and return map.
+		return HttpService:JSONDecode(map) :: Map
+	else
+		-- Build and return map.
+		return buildMap() :: Map
+	end
 end
