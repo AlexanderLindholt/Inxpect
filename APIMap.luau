@@ -20,7 +20,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.1.0
+v1.1.1
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and plugin cross-communication.
@@ -30,7 +30,7 @@ GitHub:
 https://github.com/AlexanderLindholt/Inxpect
 
 DevForum:
-https://devforum.roblox.com/t/
+https://devforum.roblox.com/t/3799622
 
 
 --------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ local plugin = script:FindFirstAncestorOfClass("Plugin")
 -- Map builder function.
 local function buildMap()
 	-- Let the other plugins know that we're building the map.
-	if plugin then workspace:SetAttribute("PropertyMapCache", true) end
+	if plugin then workspace:SetAttribute("MapCache", true) end
 	
 	-- Grab the latest Roblox API dump from GitHub.
 	local apiDump = HttpService:JSONDecode(
@@ -169,7 +169,7 @@ local function buildMap()
 	end
 	
 	-- Cache map.
-	if plugin then workspace:SetAttribute("PropertyMapCache", HttpService:JSONEncode(map)) end
+	if plugin then workspace:SetAttribute("MapCache", HttpService:JSONEncode(map)) end
 	
 	-- Return map.
 	return map
