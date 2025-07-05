@@ -20,14 +20,14 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.0.0
+v1.1.0
 
-Simple and efficient property map builder for Roblox,
+A super easy and efficient API map builder for Roblox,
 with plugin support and plugin cross-communication.
 
 
 GitHub:
-https://github.com/AlexanderLindholt/PropertyMap
+https://github.com/AlexanderLindholt/Inxpect
 
 DevForum:
 https://devforum.roblox.com/t/
@@ -62,6 +62,7 @@ SOFTWARE.
 -- Services.
 local StudioService = game:GetService("StudioService")
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 
 -- Property map type.
 type PropertyMap = {
@@ -112,12 +113,13 @@ local function translateType(valueType)
 		types[valueType.Name] or valueType.Name
 end
 
+
 local plugin = script:FindFirstAncestorOfClass("Plugin")
 
 -- Map builder function.
 local function buildMap()
 	-- Let the other plugins know that we're building the map.
-	if plugin then StudioService:SetAttribute("PropertyMapCache", true) end
+	if plugin then workspace:SetAttribute("PropertyMapCache", true) end
 	
 	-- Grab the latest Roblox API dump from GitHub.
 	local apiDump = HttpService:JSONDecode(
@@ -167,7 +169,7 @@ local function buildMap()
 	end
 	
 	-- Cache map.
-	if plugin then StudioService:SetAttribute("PropertyMapCache", HttpService:JSONEncode(propertyMap)) end
+	if plugin then workspace:SetAttribute("PropertyMapCache", HttpService:JSONEncode(propertyMap)) end
 	
 	-- Return map.
 	return propertyMap
@@ -175,19 +177,24 @@ end
 
 -- Retrieve/build and return map.
 if plugin then
-	local propertyMap = StudioService:GetAttribute("PropertyMapCache")
-	if propertyMap then
-		if propertyMap == true then
-			-- Another plugin is building the map, so we wait for it to finish.
-			while true do
-				task.wait()
-				propertyMap = StudioService:GetAttribute("PropertyMapCache")
-				if propertyMap ~= true then break end
-			end
-		end
-		return HttpService:JSONDecode(propertyMap) :: PropertyMap
-	else
+	if not RunService:IsRunning() and not StudioService:GetAttribute("PropertyMapCached") then
+		StudioService:SetAttribute("PropertyMapCached", true)
 		return buildMap() :: PropertyMap
+	else
+		local propertyMap = workspace:GetAttribute("PropertyMapCache")
+		if propertyMap then
+			if propertyMap == true then
+				-- Another plugin is building the map, so we wait for it to finish.
+				while true do
+					task.wait()
+					propertyMap = workspace:GetAttribute("PropertyMapCache")
+					if propertyMap ~= true then break end
+				end
+			end
+			return HttpService:JSONDecode(propertyMap) :: PropertyMap
+		else
+			return buildMap() :: PropertyMap
+		end
 	end
 else
 	return buildMap() :: PropertyMap
