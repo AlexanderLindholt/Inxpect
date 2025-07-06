@@ -20,7 +20,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.3.1
+v1.4.0
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and plugin cross-communication.
@@ -63,14 +63,14 @@ SOFTWARE.
 
 What the different cache locations are for:
 - Workspace: Current game
-- StudioService: Current session (edit mode)
-- Plugin: Current plugin (almost permanent)
+- StudioService: Current session (edit mode only)
+- Plugin: Current plugin
 
 They are all needed and work together. Very smart :D
 
 ]]--
 
--- Attempt to find the plugin object. Used to check for plugin context.
+-- Attempt to find the plugin object.
 local plugin = script:FindFirstAncestorOfClass("Plugin")
 
 -- Services.
@@ -103,26 +103,7 @@ local types = {
 	int8 = "number"
 }
 
--- Property functions.
-local function isPublicProperty(member)
-	if member.MemberType ~= "Property" then return end
-	
-	local security = member.Security
-	if security ~= "None" then
-		if (security.Read and security.Read ~= "None") or
-			(security.Write and security.Write ~= "None") then
-			return
-		end
-	end
-	
-	if member.Tags then
-		for _, tag in member.Tags do
-			if readOnlyTags[tag] then return end
-		end
-	end
-	
-	if member.ValueType ~= nil then return true end
-end
+-- Function for translating the type found in API dump into Luau type.
 local function translateType(valueType)
 	return if valueType.Category == "Class" then
 		"Instance"
@@ -130,6 +111,26 @@ local function translateType(valueType)
 		"Enum."..valueType.Name
 		else
 		types[valueType.Name] or valueType.Name
+end
+-- Function for creating property data table.
+local function createProperty(member)
+	local writable = true
+	do -- Detect read-only.
+		local security = member.Security
+		if security ~= "None" then
+			if (security.Read and security.Read ~= "None") or
+				(security.Write and security.Write ~= "None") then
+				writable = false
+			end
+		end
+		if member.Tags then
+			for _, tag in member.Tags do
+				if readOnlyTags[tag] then writable = false end
+			end
+		end
+	end
+	
+	return {Type = translateType(member.ValueType), Writable = writable}
 end
 
 -- API map builder function.
@@ -195,16 +196,16 @@ local function buildMap()
 		for index = #superClasses, 1, -1 do
 			local superClass = superClasses[index]
 			for _, member in superClass.Members do
-				if isPublicProperty(member) then
-					properties[member.Name] = translateType(member.ValueType)
+				if member.MemberType == "Property" then
+					properties[member.Name] = createProperty(member)
 				end
 			end
 		end
 		
 		-- Add local properties.
 		for _, member in class.Members do
-			if isPublicProperty(member) then
-				properties[member.Name] = translateType(member.ValueType)
+			if member.MemberType == "Property" then
+				properties[member.Name] = createProperty(member)
 			end
 		end
 		
