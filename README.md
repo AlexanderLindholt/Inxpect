@@ -34,18 +34,22 @@ Additionally, the syntax can't get any simpler!
 ```luau
 local apiMap = require(script.APIMap) -- Inxpect is named 'APIMap' — since that makes sense.
 ```
-
 <br>
-Don't worry, it provides only what's important:
 
+Don't worry, it provides only what's important:
 ```luau
 {
-	Class (string) = {
-		Property (string) = Type (string)
+	-- Classes.
+	string = {
+		-- Properties.
+		string = {
+			-- Property data.
+			Type = string
+			Writable = boolean
+		}
 	}
 }
 ```
-Properties that are not publicly accessible are filtered out.<br>
 <br>
 <br>
 
@@ -62,10 +66,11 @@ local function printProperties(class)
 	local properties = apiMap[class]
 	
 	local output = class.."'s properties:"
-	for propertyName, propertyType in properties do
+	for name, data in properties do
 		output ..=
-			"\n\n    Name: "..propertyName..
-			"\n    Type: "..propertyType
+			"\n\n    Name: "..name..
+			"\n    Type: "..data.Type..
+			"\n    Writable: "..tostring(data.Writable)
 	end
 	print(output)
 end
@@ -79,200 +84,346 @@ Part's properties:
 
     Name: RightParamB
     Type: number
+    Writable: true
 
     Name: CFrame
     Type: CFrame
+    Writable: true
 
     Name: RightSurface
     Type: Enum.SurfaceType
+    Writable: true
+
+    Name: Mass
+    Type: number
+    Writable: false
 
     Name: archivable
     Type: boolean
+    Writable: true
 
     Name: Friction
     Type: number
+    Writable: true
 
     Name: FrontParamB
     Type: number
+    Writable: true
 
     Name: BottomSurface
     Type: Enum.SurfaceType
+    Writable: true
+
+    Name: ExtentsSize
+    Type: Vector3
+    Writable: false
 
     Name: CollisionGroup
     Type: string
+    Writable: true
 
-    Name: BackSurfaceInput
-    Type: Enum.InputType
+    Name: AssemblyMass
+    Type: number
+    Writable: false
 
     Name: AssemblyLinearVelocity
     Type: Vector3
+    Writable: true
 
     Name: Elasticity
     Type: number
+    Writable: true
 
     Name: FrontParamA
     Type: number
+    Writable: true
 
     Name: MaterialVariant
     Type: string
+    Writable: true
 
     Name: RightParamA
     Type: number
-
-    Name: Color
-    Type: Color3
-
-    Name: Massless
-    Type: boolean
-
-    Name: CollisionGroupId
-    Type: number
-
-    Name: RotVelocity
-    Type: Vector3
-
-    Name: Locked
-    Type: boolean
-
-    Name: Material
-    Type: Enum.Material
-
-    Name: Size
-    Type: Vector3
-
-    Name: BackSurface
-    Type: Enum.SurfaceType
-
-    Name: LocalTransparencyModifier
-    Type: number
-
-    Name: CustomPhysicalProperties
-    Type: PhysicalProperties
-
-    Name: Rotation
-    Type: Vector3
-
-    Name: Name
-    Type: string
-
-    Name: AudioCanCollide
-    Type: boolean
-
-    Name: LeftParamA
-    Type: number
-
-    Name: CastShadow
-    Type: boolean
-
-    Name: PivotOffset
-    Type: CFrame
-
-    Name: TopSurfaceInput
-    Type: Enum.InputType
-
-    Name: Anchored
-    Type: boolean
-
-    Name: FrontSurfaceInput
-    Type: Enum.InputType
-
-    Name: BottomParamB
-    Type: number
-
-    Name: AssemblyAngularVelocity
-    Type: Vector3
-
-    Name: Capabilities
-    Type: SecurityCapabilities
-
-    Name: BottomSurfaceInput
-    Type: Enum.InputType
-
-    Name: CanCollide
-    Type: boolean
-
-    Name: Sandboxed
-    Type: boolean
-
-    Name: EnableFluidForces
-    Type: boolean
-
-    Name: LeftSurface
-    Type: Enum.SurfaceType
-
-    Name: Transparency
-    Type: number
-
-    Name: brickColor
-    Type: BrickColor
-
-    Name: Orientation
-    Type: Vector3
-
-    Name: LeftSurfaceInput
-    Type: Enum.InputType
-
-    Name: TopParamA
-    Type: number
-
-    Name: CanQuery
-    Type: boolean
-
-    Name: BottomParamA
-    Type: number
-
-    Name: Archivable
-    Type: boolean
-
-    Name: Reflectance
-    Type: number
-
-    Name: formFactor
-    Type: Enum.FormFactor
-
-    Name: FormFactor
-    Type: Enum.FormFactor
-
-    Name: RootPriority
-    Type: number
-
-    Name: BackParamA
-    Type: number
-
-    Name: Velocity
-    Type: Vector3
-
-    Name: TopSurface
-    Type: Enum.SurfaceType
-
-    Name: CanTouch
-    Type: boolean
-
-    Name: TopParamB
-    Type: number
-
-    Name: LeftParamB
-    Type: number
+    Writable: true
 
     Name: Parent
     Type: Instance
+    Writable: true
 
-    Name: BrickColor
+    Name: Massless
+    Type: boolean
+    Writable: true
+
+    Name: CollisionGroupId
+    Type: number
+    Writable: true
+
+    Name: AssemblyRootPart
+    Type: Instance
+    Writable: false
+
+    Name: Locked
+    Type: boolean
+    Writable: true
+
+    Name: Material
+    Type: Enum.Material
+    Writable: true
+
+    Name: Size
+    Type: Vector3
+    Writable: true
+
+    Name: BackSurface
+    Type: Enum.SurfaceType
+    Writable: true
+
+    Name: LocalTransparencyModifier
+    Type: number
+    Writable: true
+
+    Name: CustomPhysicalProperties
+    Type: PhysicalProperties
+    Writable: true
+
+    Name: Rotation
+    Type: Vector3
+    Writable: true
+
+    Name: ReceiveAge
+    Type: number
+    Writable: false
+
+    Name: Name
+    Type: string
+    Writable: true
+
+    Name: className
+    Type: string
+    Writable: false
+
+    Name: RobloxLocked
+    Type: boolean
+    Writable: false
+
+    Name: LeftParamA
+    Type: number
+    Writable: true
+
+    Name: CastShadow
+    Type: boolean
+    Writable: true
+
+    Name: PivotOffset
+    Type: CFrame
+    Writable: true
+
+    Name: Origin
+    Type: CFrame
+    Writable: false
+
+    Name: TopSurfaceInput
+    Type: Enum.InputType
+    Writable: true
+
+    Name: Anchored
+    Type: boolean
+    Writable: true
+
+    Name: FrontSurfaceInput
+    Type: Enum.InputType
+    Writable: true
+
+    Name: BottomParamB
+    Type: number
+    Writable: true
+
+    Name: AssemblyAngularVelocity
+    Type: Vector3
+    Writable: true
+
+    Name: Capabilities
+    Type: SecurityCapabilities
+    Writable: true
+
+    Name: BottomSurfaceInput
+    Type: Enum.InputType
+    Writable: true
+
+    Name: CanCollide
+    Type: boolean
+    Writable: true
+
+    Name: Sandboxed
+    Type: boolean
+    Writable: true
+
+    Name: EnableFluidForces
+    Type: boolean
+    Writable: true
+
+    Name: LeftSurface
+    Type: Enum.SurfaceType
+    Writable: true
+
+    Name: AudioCanCollide
+    Type: boolean
+    Writable: true
+
+    Name: Transparency
+    Type: number
+    Writable: true
+
+    Name: ExtentsCFrame
+    Type: CFrame
+    Writable: false
+
+    Name: ClassName
+    Type: string
+    Writable: false
+
+    Name: Orientation
+    Type: Vector3
+    Writable: true
+
+    Name: CanQuery
+    Type: boolean
+    Writable: true
+
+    Name: AssemblyCenterOfMass
+    Type: Vector3
+    Writable: false
+
+    Name: brickColor
     Type: BrickColor
+    Writable: true
+
+    Name: Pivot Offset
+    Type: CFrame
+    Writable: false
+
+    Name: ResizeableFaces
+    Type: Faces
+    Writable: false
+
+    Name: Reflectance
+    Type: number
+    Writable: true
 
     Name: FrontSurface
     Type: Enum.SurfaceType
+    Writable: true
 
-    Name: RightSurfaceInput
+    Name: LeftParamB
+    Type: number
+    Writable: true
+
+    Name: SourceAssetId
+    Type: number
+    Writable: false
+
+    Name: TopParamB
+    Type: number
+    Writable: true
+
+    Name: LeftSurfaceInput
     Type: Enum.InputType
+    Writable: true
 
     Name: BackParamB
     Type: number
+    Writable: true
 
-    Name: Shape
-    Type: Enum.PartType
+    Name: Color
+    Type: Color3
+    Writable: true
+
+    Name: RootPriority
+    Type: number
+    Writable: true
+
+    Name: CenterOfMass
+    Type: Vector3
+    Writable: false
+
+    Name: BottomParamA
+    Type: number
+    Writable: true
+
+    Name: DataCost
+    Type: number
+    Writable: false
+
+    Name: Archivable
+    Type: boolean
+    Writable: true
+
+    Name: ResizeIncrement
+    Type: number
+    Writable: false
+
+    Name: formFactor
+    Type: Enum.FormFactor
+    Writable: true
 
     Name: Position
     Type: Vector3
+    Writable: true
+
+    Name: BackSurfaceInput
+    Type: Enum.InputType
+    Writable: true
+
+    Name: BackParamA
+    Type: number
+    Writable: true
+
+    Name: RightSurfaceInput
+    Type: Enum.InputType
+    Writable: true
+
+    Name: CurrentPhysicalProperties
+    Type: PhysicalProperties
+    Writable: false
+
+    Name: CanTouch
+    Type: boolean
+    Writable: true
+
+    Name: RotVelocity
+    Type: Vector3
+    Writable: true
+
+    Name: SpecificGravity
+    Type: number
+    Writable: false
+
+    Name: TopParamA
+    Type: number
+    Writable: true
+
+    Name: BrickColor
+    Type: BrickColor
+    Writable: true
+
+    Name: TopSurface
+    Type: Enum.SurfaceType
+    Writable: true
+
+    Name: Velocity
+    Type: Vector3
+    Writable: true
+
+    Name: UniqueId
+    Type: UniqueId
+    Writable: false
+
+    Name: Shape
+    Type: Enum.PartType
+    Writable: true
+
+    Name: FormFactor
+    Type: Enum.FormFactor
+    Writable: true
 ```
 </details>
