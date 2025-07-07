@@ -20,7 +20,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.4.2
+v1.4.3
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and smart cross-communication.
@@ -173,7 +173,8 @@ local function buildMap()
 						if changed then break end
 						if os.time() - start > 3 then -- Timeout after 3 seconds.
 							connection:Disconnect()
-							error("Please restart session, and ensure internet connection.")
+							warn("\nPlugin '"..plugin:GetChildren()[1].Name.."':\nPlease restart session, and ensure internet connection.")
+							coroutine.yield()
 						end
 					end
 					connection:Disconnect()
