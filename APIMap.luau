@@ -20,10 +20,10 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.4.1
+v1.4.2
 
 A super easy and efficient API map builder for Roblox,
-with plugin support and plugin cross-communication.
+with plugin support and smart cross-communication.
 
 
 GitHub:
@@ -139,7 +139,7 @@ end
 -- API map builder function.
 local function buildMap()
 	-- Let copies of this library know that we're building the map.
-	workspace:SetAttribute("APIMapCache", true)
+	workspace:SetAttribute("APIMapBuilding", true)
 	
 	-- Grab the latest Roblox API dump from GitHub.
 	local success, apiDump = pcall(HttpService.GetAsync, HttpService,
@@ -147,6 +147,8 @@ local function buildMap()
 		true -- We disable caching because we only request this data once.
 	)
 	if not success then
+		workspace:SetAttribute("APIMapBuilding", nil)
+		
 		if plugin then
 			local map = plugin:GetSetting("APIMapCache") -- Grab the map from plugin cache.
 			if map then
@@ -156,17 +158,31 @@ local function buildMap()
 				return HttpService:JSONDecode(map)
 			else
 				map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
-				if not map then
-					-- We hope that a copy of this library has the map cached, and wait for it to provide it.
-					workspace:GetAttributeChangedSignal("APIMapCache"):Wait()
+				if map then
+					-- Decode and return map.
+					return HttpService:JSONDecode(map) :: APIMap
+				else
+					-- We hope that a copy of this library has cache and will provide it.
+					local changed = false
+					local connection = workspace:GetAttributeChangedSignal("APIMapCache"):Connect(function()
+						changed = true
+					end)
+					local start = os.time()
+					while true do
+						task.wait()
+						if changed then break end
+						if os.time() - start > 3 then -- Timeout after 3 seconds.
+							connection:Disconnect()
+							error("Please restart session, and ensure internet connection.")
+						end
+					end
+					connection:Disconnect()
 					
 					-- Grab the map from current place cache.
 					map = workspace:GetAttribute("APIMapCache")
 					-- Cache the map in plugin. 
 					plugin:SetSetting("APIMapCache", map) -- APIMap is already encoded btw.
 				end
-				-- Decode and return map.
-				return HttpService:JSONDecode(map) :: APIMap
 			end
 		end
 		return
@@ -221,6 +237,9 @@ local function buildMap()
 	workspace:SetAttribute("APIMapCache", encodedMap)
 	if plugin then plugin:SetSetting("APIMapCache", encodedMap) end
 	
+	-- Let copies of this library know that we're no longer building.
+	workspace:SetAttribute("APIMapBuilding", nil)
+	
 	-- Return map.
 	return map
 end
@@ -238,7 +257,10 @@ if plugin then -- Plugin context.
 	else
 		local map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
 		if map then
-			if map == true then
+			-- Decode and return map.
+			return HttpService:JSONDecode(map) :: APIMap
+		else
+			if workspace:GetAttribute("APIMapBuilding") then
 				-- A copy of this library is building the map, so we wait for it to finish.
 				workspace:GetAttributeChangedSignal("APIMapCache"):Wait()
 				
@@ -246,27 +268,31 @@ if plugin then -- Plugin context.
 				map = workspace:GetAttribute("APIMapCache")
 				-- Cache the map in plugin.
 				plugin:SetSetting("APIMapCache", map) -- APIMap is already encoded btw.
+				-- Decode and return map.
+				return HttpService:JSONDecode(map) :: APIMap
+			else
+				-- Build and return map.
+				return buildMap() :: APIMap
 			end
+		end
+	end
+else -- Game context.
+	local map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
+	if map then
+		-- Decode and return map.
+		return HttpService:JSONDecode(map) :: APIMap
+	else
+		if workspace:GetAttribute("APIMapBuilding") then
+			-- A copy of this library is building the map, so we wait for it to finish.
+			workspace:GetAttributeChangedSignal("APIMapCache"):Wait()
+			
+			-- Grab the map from current place cache.
+			map = workspace:GetAttribute("APIMapCache")
 			-- Decode and return map.
 			return HttpService:JSONDecode(map) :: APIMap
 		else
 			-- Build and return map.
 			return buildMap() :: APIMap
 		end
-	end
-else -- Game context.
-	local map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
-	if map then
-		if map == true then
-			-- A copy of this library is building the map, so we wait for it to finish.
-			workspace:GetAttributeChangedSignal("APIMapCache"):Wait()
-			-- Grab the map from current place cache.
-			map = workspace:GetAttribute("APIMapCache")
-		end
-		-- Decode and return map.
-		return HttpService:JSONDecode(map) :: APIMap
-	else
-		-- Build and return map.
-		return buildMap() :: APIMap
 	end
 end
