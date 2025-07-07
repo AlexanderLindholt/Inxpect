@@ -20,7 +20,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.4.0
+v1.4.1
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and plugin cross-communication.
@@ -78,10 +78,13 @@ local StudioService = if plugin then game:GetService("StudioService") else nil
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
--- Map type.
-type Map = {
+-- API map type.
+type APIMap = {
 	[string]: {
-		[string]: string
+		[string]: {
+			Type: string,
+			Writable: boolean
+		}
 	}
 }
 
@@ -160,10 +163,10 @@ local function buildMap()
 					-- Grab the map from current place cache.
 					map = workspace:GetAttribute("APIMapCache")
 					-- Cache the map in plugin. 
-					plugin:SetSetting("APIMapCache", map) -- Map is already encoded btw.
+					plugin:SetSetting("APIMapCache", map) -- APIMap is already encoded btw.
 				end
 				-- Decode and return map.
-				return HttpService:JSONDecode(map) :: Map
+				return HttpService:JSONDecode(map) :: APIMap
 			end
 		end
 		return
@@ -226,12 +229,12 @@ end
 if plugin then -- Plugin context.
 	if RunService:IsRunning() then
 		-- Grab, decode and return map from current place cache.
-		return HttpService:JSONDecode(workspace:GetAttribute("APIMapCache")) :: Map
+		return HttpService:JSONDecode(workspace:GetAttribute("APIMapCache")) :: APIMap
 	elseif not StudioService:GetAttribute("APIMapCache") then
 		-- Mark the current session as "has built"
 		StudioService:SetAttribute("APIMapCache", true)
 		-- Build and return map.
-		return buildMap() :: Map
+		return buildMap() :: APIMap
 	else
 		local map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
 		if map then
@@ -242,13 +245,13 @@ if plugin then -- Plugin context.
 				-- Grab the map from current place cache.
 				map = workspace:GetAttribute("APIMapCache")
 				-- Cache the map in plugin.
-				plugin:SetSetting("APIMapCache", map) -- Map is already encoded btw.
+				plugin:SetSetting("APIMapCache", map) -- APIMap is already encoded btw.
 			end
 			-- Decode and return map.
-			return HttpService:JSONDecode(map) :: Map
+			return HttpService:JSONDecode(map) :: APIMap
 		else
 			-- Build and return map.
-			return buildMap() :: Map
+			return buildMap() :: APIMap
 		end
 	end
 else -- Game context.
@@ -261,9 +264,9 @@ else -- Game context.
 			map = workspace:GetAttribute("APIMapCache")
 		end
 		-- Decode and return map.
-		return HttpService:JSONDecode(map) :: Map
+		return HttpService:JSONDecode(map) :: APIMap
 	else
 		-- Build and return map.
-		return buildMap() :: Map
+		return buildMap() :: APIMap
 	end
 end
