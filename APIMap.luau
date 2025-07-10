@@ -20,7 +20,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.4.3
+v1.4.4
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and smart cross-communication.
@@ -161,28 +161,6 @@ local function buildMap()
 				if map then
 					-- Decode and return map.
 					return HttpService:JSONDecode(map) :: APIMap
-				else
-					-- We hope that a copy of this library has cache and will provide it.
-					local changed = false
-					local connection = workspace:GetAttributeChangedSignal("APIMapCache"):Connect(function()
-						changed = true
-					end)
-					local start = os.time()
-					while true do
-						task.wait()
-						if changed then break end
-						if os.time() - start > 3 then -- Timeout after 3 seconds.
-							connection:Disconnect()
-							warn("\nPlugin '"..plugin:GetChildren()[1].Name.."':\nPlease restart session, and ensure internet connection.")
-							coroutine.yield()
-						end
-					end
-					connection:Disconnect()
-					
-					-- Grab the map from current place cache.
-					map = workspace:GetAttribute("APIMapCache")
-					-- Cache the map in plugin. 
-					plugin:SetSetting("APIMapCache", map) -- APIMap is already encoded btw.
 				end
 			end
 		end
