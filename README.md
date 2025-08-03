@@ -54,7 +54,7 @@ Don't worry, it provides only what's important:
 <br>
 
 > [!note]
-> LocalScripts shouldn't require this module. They should instead request the API map from the server through a RemoteFunction.
+> Using Inxpect in a game requires you to have [Packet+](https://github.com/AlexanderLindholt/PacketPlus) installed.
 
 <br>
 
