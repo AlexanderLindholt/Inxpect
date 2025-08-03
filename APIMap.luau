@@ -20,7 +20,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.4.4
+v1.5.0
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and smart cross-communication.
@@ -70,11 +70,10 @@ They are all needed and work together. Very smart :D
 
 ]]--
 
--- Attempt to find the plugin object.
+-- Attempt to get the plugin object.
 local plugin = script:FindFirstAncestorOfClass("Plugin")
 
--- Services.
-local StudioService = if plugin then game:GetService("StudioService") else nil
+-- Main services.
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
@@ -117,8 +116,9 @@ local function translateType(valueType)
 end
 -- Function for creating property data table.
 local function createProperty(member)
+	-- Detect writability.
 	local writable = true
-	do -- Detect read-only.
+	do
 		local security = member.Security
 		if security ~= "None" then
 			if (security.Read and security.Read ~= "None") or
@@ -133,7 +133,11 @@ local function createProperty(member)
 		end
 	end
 	
-	return {Type = translateType(member.ValueType), Writable = writable}
+	-- Build and return property data table.
+	return {
+		Type = translateType(member.ValueType), -- We translate the non-luau type.
+		Writable = writable
+	}
 end
 
 -- API map builder function.
@@ -225,6 +229,8 @@ end
 
 -- Retrieve/build and return map.
 if plugin then -- Plugin context.
+	local StudioService = game:GetService("StudioService")
+	
 	if RunService:IsRunning() then
 		-- Grab, decode and return map from current place cache.
 		return HttpService:JSONDecode(workspace:GetAttribute("APIMapCache")) :: APIMap
@@ -256,22 +262,37 @@ if plugin then -- Plugin context.
 		end
 	end
 else -- Game context.
-	local map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
-	if map then
-		-- Decode and return map.
-		return HttpService:JSONDecode(map) :: APIMap
+	local CollectionService = game:GetService("CollectionService")
+	
+	local packets = CollectionService:GetTagged("Packets")[1]
+	if not packets then error("Could not find packets module.") end
+	packets = require(packets)
+	
+	if RunService:IsClient() then
+		map = packets.GetAPIMap:Fire()
 	else
-		if workspace:GetAttribute("APIMapBuilding") then
-			-- A copy of this library is building the map, so we wait for it to finish.
-			workspace:GetAttributeChangedSignal("APIMapCache"):Wait()
-			
-			-- Grab the map from current place cache.
-			map = workspace:GetAttribute("APIMapCache")
-			-- Decode and return map.
-			return HttpService:JSONDecode(map) :: APIMap
+		-- Get map.
+		local map = nil
+		if RunService:IsStudio() then
+			map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache.
+			if map then
+				-- Decode map.
+				map = HttpService:JSONDecode(map)
+			else
+				-- Build map.
+				map = buildMap()
+			end
 		else
-			-- Build and return map.
-			return buildMap() :: APIMap
+			-- Build map.
+			map = buildMap()
+		end
+		
+		-- Setup client map retrieval.
+		packets.GetAPIMap.OnServerInvoke = function()
+			return map
 		end
 	end
+	
+	-- Return map.
+	return map :: APIMap
 end
