@@ -50,11 +50,6 @@ Don't worry, it provides only what's important:
 	}
 }
 ```
-<br>
-<br>
-
-> [!note]
-> Using Inxpect in a game requires you to have [Packet+](https://github.com/AlexanderLindholt/PacketPlus) installed.
 
 <br>
 
@@ -427,3 +422,20 @@ Part's properties:
     Writable: true
 ```
 </details>
+
+<br>
+
+# 🎮 Using it in a game.
+Install [Packet+](https://github.com/AlexanderLindholt/PacketPlus) if not already installed.
+
+Ensure this `GetAPIMap` packet in your packet definitions module:
+```
+local Packet = require(script.Packet)
+
+return {
+	GetAPIMap = Packet():Response(Packet.Any)
+	-- The rest of your packets.
+}
+```
+
+Then you can use Inxpect just like usual!
