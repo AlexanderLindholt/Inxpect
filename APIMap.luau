@@ -315,12 +315,12 @@ else -- Game context.
 	if not packets then error("Could not find packets module.") end
 	packets = require(packets)
 	
+	local map
 	if RunService:IsClient() then
 		-- Request the server for the map.
 		map = packets.GetAPIMap:Fire()
 	else -- Server context.
 		-- Retrieve or build map.
-		local map
 		if workspace:GetAttribute("APIMapVersion") == mapVersion then
 			-- Grab and decode map.
 			map = HttpService:JSONDecode(workspace:GetAttribute("APIMap"))
