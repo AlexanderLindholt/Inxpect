@@ -192,7 +192,7 @@ local function buildMap()
 			end
 		end
 		
-		return nil
+		return
 	end
 	
 	-- Decode the API dump.
