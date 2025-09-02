@@ -435,7 +435,7 @@ Install [Packet+](https://github.com/AlexanderLindholt/PacketPlus) if not alread
 
 Now ensure that your packet definitions module is tagged `Packets`, so that Inxpect can find it. <br>
 Then put this `GetAPIMap` packet in your packet definitions module:
-```
+```luau
 local Packet = require(script.Packet)
 
 return {
