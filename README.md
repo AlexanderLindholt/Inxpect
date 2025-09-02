@@ -23,11 +23,16 @@ Inxpect allows you to easily inspect what was otherwise hidden.
 # ✨ Fast, easy, smart.
 It's super efficient, easy-to-use, and has full plugin support.
 
-It will intelligently communicate with copies of itself (from other plugins / elsewhere in the game),<br>
-ensuring **only 1 script is doing the hard job**. The one working will share the finished map with the rest.
+It will intelligently communicate with copies of itself from other plugins, ensuring<br>
+only 1 script does the hard job, and that multiple identical maps never coexist.
 
-In plugins, it even works offline AND while the game is running.<br>
-This is possible due to its intelligent caching.<br>
+If an already up-to-date map is found in cache, it won't generate a new one.
+
+In plugins, it even partially works offline and while the game is running.<br>
+This is possible due to its intelligent caching.
+
+*Note that the first time, you *have* to use it with internet connection,<br>
+and it's also not gauranteed to be fully up-to-date when using offline.*
 <br>
 
 Additionally, the syntax can't get any simpler!
@@ -38,14 +43,14 @@ local apiMap = require(script.APIMap) -- Inxpect is named 'APIMap' — since tha
 
 Don't worry, it provides only what's important:
 ```luau
-{
+local apiMap = require(script.APIMap) :: {
 	-- Classes.
-	string = {
+	[string]: {
 		-- Properties.
-		string = {
-			-- Property data.
-			Type = string
-			Writable = boolean
+		[string]: {
+			-- Property info.
+			Type: string,
+			Locked: boolean
 		}
 	}
 }
@@ -65,7 +70,7 @@ local function printProperties(class)
 		output ..=
 			"\n\n    Name: "..name..
 			"\n    Type: "..data.Type..
-			"\n    Writable: "..tostring(data.Writable)
+			"\n    Locked: "..tostring(data.Locked)
 	end
 	print(output)
 end
@@ -79,347 +84,347 @@ Part's properties:
 
     Name: RightParamB
     Type: number
-    Writable: true
+    Locked: false
 
     Name: CFrame
     Type: CFrame
-    Writable: true
+    Locked: false
 
     Name: RightSurface
     Type: Enum.SurfaceType
-    Writable: true
+    Locked: false
 
     Name: Mass
     Type: number
-    Writable: false
+    Locked: true
 
     Name: archivable
     Type: boolean
-    Writable: true
+    Locked: false
 
     Name: Friction
     Type: number
-    Writable: true
+    Locked: false
 
     Name: FrontParamB
     Type: number
-    Writable: true
+    Locked: false
 
     Name: BottomSurface
     Type: Enum.SurfaceType
-    Writable: true
+    Locked: false
 
     Name: ExtentsSize
     Type: Vector3
-    Writable: false
+    Locked: true
 
     Name: CollisionGroup
     Type: string
-    Writable: true
+    Locked: false
 
     Name: AssemblyMass
     Type: number
-    Writable: false
+    Locked: true
 
     Name: AssemblyLinearVelocity
     Type: Vector3
-    Writable: true
+    Locked: false
 
     Name: Elasticity
     Type: number
-    Writable: true
+    Locked: false
 
     Name: FrontParamA
     Type: number
-    Writable: true
+    Locked: false
 
     Name: MaterialVariant
     Type: string
-    Writable: true
+    Locked: false
 
     Name: RightParamA
     Type: number
-    Writable: true
+    Locked: false
 
     Name: Parent
     Type: Instance
-    Writable: true
+    Locked: false
 
     Name: Massless
     Type: boolean
-    Writable: true
+    Locked: false
 
     Name: CollisionGroupId
     Type: number
-    Writable: true
+    Locked: false
 
     Name: AssemblyRootPart
     Type: Instance
-    Writable: false
+    Locked: true
 
     Name: Locked
     Type: boolean
-    Writable: true
+    Locked: false
 
     Name: Material
     Type: Enum.Material
-    Writable: true
+    Locked: false
 
     Name: Size
     Type: Vector3
-    Writable: true
+    Locked: false
 
     Name: BackSurface
     Type: Enum.SurfaceType
-    Writable: true
+    Locked: false
 
     Name: LocalTransparencyModifier
     Type: number
-    Writable: true
+    Locked: false
 
     Name: CustomPhysicalProperties
     Type: PhysicalProperties
-    Writable: true
+    Locked: false
 
     Name: Rotation
     Type: Vector3
-    Writable: true
+    Locked: false
 
     Name: ReceiveAge
     Type: number
-    Writable: false
+    Locked: true
 
     Name: Name
     Type: string
-    Writable: true
+    Locked: false
 
     Name: className
     Type: string
-    Writable: false
+    Locked: true
 
     Name: RobloxLocked
     Type: boolean
-    Writable: false
+    Locked: true
 
     Name: LeftParamA
     Type: number
-    Writable: true
+    Locked: false
 
     Name: CastShadow
     Type: boolean
-    Writable: true
+    Locked: false
 
     Name: PivotOffset
     Type: CFrame
-    Writable: true
+    Locked: false
 
     Name: Origin
     Type: CFrame
-    Writable: false
+    Locked: true
 
     Name: TopSurfaceInput
     Type: Enum.InputType
-    Writable: true
+    Locked: false
 
     Name: Anchored
     Type: boolean
-    Writable: true
+    Locked: false
 
     Name: FrontSurfaceInput
     Type: Enum.InputType
-    Writable: true
+    Locked: false
 
     Name: BottomParamB
     Type: number
-    Writable: true
+    Locked: false
 
     Name: AssemblyAngularVelocity
     Type: Vector3
-    Writable: true
+    Locked: false
 
     Name: Capabilities
     Type: SecurityCapabilities
-    Writable: true
+    Locked: false
 
     Name: BottomSurfaceInput
     Type: Enum.InputType
-    Writable: true
+    Locked: false
 
     Name: CanCollide
     Type: boolean
-    Writable: true
+    Locked: false
 
     Name: Sandboxed
     Type: boolean
-    Writable: true
+    Locked: false
 
     Name: EnableFluidForces
     Type: boolean
-    Writable: true
+    Locked: false
 
     Name: LeftSurface
     Type: Enum.SurfaceType
-    Writable: true
-
-    Name: AudioCanCollide
-    Type: boolean
-    Writable: true
-
-    Name: Transparency
-    Type: number
-    Writable: true
-
-    Name: ExtentsCFrame
-    Type: CFrame
-    Writable: false
-
-    Name: ClassName
-    Type: string
-    Writable: false
-
-    Name: Orientation
-    Type: Vector3
-    Writable: true
-
-    Name: CanQuery
-    Type: boolean
-    Writable: true
-
-    Name: AssemblyCenterOfMass
-    Type: Vector3
-    Writable: false
-
-    Name: brickColor
-    Type: BrickColor
-    Writable: true
-
-    Name: Pivot Offset
-    Type: CFrame
-    Writable: false
-
-    Name: ResizeableFaces
-    Type: Faces
-    Writable: false
-
-    Name: Reflectance
-    Type: number
-    Writable: true
-
-    Name: FrontSurface
-    Type: Enum.SurfaceType
-    Writable: true
-
-    Name: LeftParamB
-    Type: number
-    Writable: true
-
-    Name: SourceAssetId
-    Type: number
-    Writable: false
-
-    Name: TopParamB
-    Type: number
-    Writable: true
-
-    Name: LeftSurfaceInput
-    Type: Enum.InputType
-    Writable: true
-
-    Name: BackParamB
-    Type: number
-    Writable: true
-
-    Name: Color
-    Type: Color3
-    Writable: true
-
-    Name: RootPriority
-    Type: number
-    Writable: true
-
-    Name: CenterOfMass
-    Type: Vector3
-    Writable: false
-
-    Name: BottomParamA
-    Type: number
-    Writable: true
-
-    Name: DataCost
-    Type: number
-    Writable: false
-
-    Name: Archivable
-    Type: boolean
-    Writable: true
-
-    Name: ResizeIncrement
-    Type: number
-    Writable: false
-
-    Name: formFactor
-    Type: Enum.FormFactor
-    Writable: true
-
-    Name: Position
-    Type: Vector3
-    Writable: true
-
-    Name: BackSurfaceInput
-    Type: Enum.InputType
-    Writable: true
-
-    Name: BackParamA
-    Type: number
-    Writable: true
-
-    Name: RightSurfaceInput
-    Type: Enum.InputType
-    Writable: true
+    Locked: false
 
     Name: CurrentPhysicalProperties
     Type: PhysicalProperties
-    Writable: false
+    Locked: true
 
-    Name: CanTouch
-    Type: boolean
-    Writable: true
-
-    Name: RotVelocity
-    Type: Vector3
-    Writable: true
-
-    Name: SpecificGravity
+    Name: Transparency
     Type: number
-    Writable: false
+    Locked: false
 
-    Name: TopParamA
-    Type: number
-    Writable: true
+    Name: ExtentsCFrame
+    Type: CFrame
+    Locked: true
 
-    Name: BrickColor
-    Type: BrickColor
-    Writable: true
+    Name: ClassName
+    Type: string
+    Locked: true
 
-    Name: TopSurface
-    Type: Enum.SurfaceType
-    Writable: true
-
-    Name: Velocity
+    Name: Orientation
     Type: Vector3
-    Writable: true
+    Locked: false
 
-    Name: UniqueId
-    Type: UniqueId
-    Writable: false
+    Name: Reflectance
+    Type: number
+    Locked: false
 
-    Name: Shape
-    Type: Enum.PartType
-    Writable: true
+    Name: AssemblyCenterOfMass
+    Type: Vector3
+    Locked: true
 
     Name: FormFactor
     Type: Enum.FormFactor
-    Writable: true
+    Locked: false
+
+    Name: Pivot Offset
+    Type: CFrame
+    Locked: true
+
+    Name: ResizeableFaces
+    Type: Faces
+    Locked: true
+
+    Name: CanQuery
+    Type: boolean
+    Locked: false
+
+    Name: brickColor
+    Type: BrickColor
+    Locked: false
+
+    Name: Velocity
+    Type: Vector3
+    Locked: false
+
+    Name: SourceAssetId
+    Type: number
+    Locked: true
+
+    Name: TopSurface
+    Type: Enum.SurfaceType
+    Locked: false
+
+    Name: TopParamB
+    Type: number
+    Locked: false
+
+    Name: TopParamA
+    Type: number
+    Locked: false
+
+    Name: SpecificGravity
+    Type: number
+    Locked: true
+
+    Name: RotVelocity
+    Type: Vector3
+    Locked: false
+
+    Name: RootPriority
+    Type: number
+    Locked: false
+
+    Name: BottomParamA
+    Type: number
+    Locked: false
+
+    Name: RightSurfaceInput
+    Type: Enum.InputType
+    Locked: false
+
+    Name: Archivable
+    Type: boolean
+    Locked: false
+
+    Name: ResizeIncrement
+    Type: number
+    Locked: true
+
+    Name: formFactor
+    Type: Enum.FormFactor
+    Locked: false
+
+    Name: BackSurfaceInput
+    Type: Enum.InputType
+    Locked: false
+
+    Name: Position
+    Type: Vector3
+    Locked: false
+
+    Name: BackParamA
+    Type: number
+    Locked: false
+
+    Name: DataCost
+    Type: number
+    Locked: true
+
+    Name: CenterOfMass
+    Type: Vector3
+    Locked: true
+
+    Name: CanTouch
+    Type: boolean
+    Locked: false
+
+    Name: Color
+    Type: Color3
+    Locked: false
+
+    Name: BackParamB
+    Type: number
+    Locked: false
+
+    Name: LeftSurfaceInput
+    Type: Enum.InputType
+    Locked: false
+
+    Name: BrickColor
+    Type: BrickColor
+    Locked: false
+
+    Name: LeftParamB
+    Type: number
+    Locked: false
+
+    Name: FrontSurface
+    Type: Enum.SurfaceType
+    Locked: false
+
+    Name: UniqueId
+    Type: UniqueId
+    Locked: true
+
+    Name: Shape
+    Type: Enum.PartType
+    Locked: false
+
+    Name: AudioCanCollide
+    Type: boolean
+    Locked: false
 ```
 </details>
 
@@ -428,7 +433,8 @@ Part's properties:
 # 🎮 Using it in a game.
 Install [Packet+](https://github.com/AlexanderLindholt/PacketPlus) if not already installed.
 
-Ensure this `GetAPIMap` packet in your packet definitions module:
+Now ensure that your packet definitions module is tagged `Packets`, so that Inxpect can find it. <br>
+Then put this `GetAPIMap` packet in your packet definitions module:
 ```
 local Packet = require(script.Packet)
 
