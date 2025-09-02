@@ -1,4 +1,5 @@
 --!optimize 2
+--!native
 
 --[[
 
@@ -20,7 +21,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.5.0
+v1.6.0
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and smart cross-communication.
@@ -59,16 +60,8 @@ SOFTWARE.
 
 ]]--
 
---[[
-
-What the different cache locations are for:
-- Workspace: Current game
-- StudioService: Current session (edit mode only)
-- Plugin: Current plugin
-
-They are all needed and work together. Very smart :D
-
-]]--
+-- A full version identifier for the map this code might generate.
+local mapVersion = version().."-1.6.0" -- Roblox version + library version.
 
 -- Attempt to get the plugin object.
 local plugin = script:FindFirstAncestorOfClass("Plugin")
@@ -78,22 +71,24 @@ local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
 -- API map type.
-type APIMap = {
+export type APIMap = {
+	-- Classes.
 	[string]: {
+		-- Properties.
 		[string]: {
+			-- Property info.
 			Type: string,
-			Writable: boolean
+			Locked: boolean
 		}
 	}
 }
 
--- Tags list for validation.
-local readOnlyTags = {
+-- Tags list for detecting accessbility.
+local lockedTags = {
 	ReadOnly = true,
-	NotScriptable = true,
-	NotCreatable = true
+	NotScriptable = true
 }
--- Types map for conversion.
+-- Types map for translation.
 local types = {
 	bool = "boolean",
 	int = "number",
@@ -116,27 +111,29 @@ local function translateType(valueType)
 end
 -- Function for creating property data table.
 local function createProperty(member)
-	-- Detect writability.
-	local writable = true
+	-- Detect accessibility.
+	local locked = false
 	do
+		-- Check security.
 		local security = member.Security
 		if security ~= "None" then
 			if (security.Read and security.Read ~= "None") or
 				(security.Write and security.Write ~= "None") then
-				writable = false
+				locked = true
 			end
 		end
-		if member.Tags then
+		-- Search tags.
+		if not locked and member.Tags then
 			for _, tag in member.Tags do
-				if readOnlyTags[tag] then writable = false end
+				if lockedTags[tag] then locked = true end
 			end
 		end
 	end
 	
 	-- Build and return property data table.
 	return {
-		Type = translateType(member.ValueType), -- We translate the non-luau type.
-		Writable = writable
+		Type = translateType(member.ValueType), -- Translate the type to Luau.
+		Locked = locked
 	}
 end
 
@@ -148,27 +145,54 @@ local function buildMap()
 	-- Grab the latest Roblox API dump from GitHub.
 	local success, apiDump = pcall(HttpService.GetAsync, HttpService,
 		"https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/refs/heads/roblox/API-Dump.json",
-		true -- We disable caching because we only request this data once.
+		true -- Disable caching because we only request this data once.
 	)
 	if not success then
 		workspace:SetAttribute("APIMapBuilding", nil)
 		
 		if plugin then
-			local map = plugin:GetSetting("APIMapCache") -- Grab the map from plugin cache.
-			if map then
-				-- Cache map for current place.
-				workspace:SetAttribute("APIMapCache", map)
+			if plugin:GetSetting("APIMapVersion") == mapVersion then
+				-- Grab the map from plugin storage.
+				map = plugin:GetSetting("APIMap")
+				-- Store map in current place.
+				workspace:SetAttribute("APIMap", map)
+				workspace:SetAttribute("APIMapVersion", mapVersion)
 				-- Decode and return map.
 				return HttpService:JSONDecode(map)
 			else
-				map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
-				if map then
+				if workspace:GetAttribute("APIMapVersion") == mapVersion then
+					-- Grab the map from current place storage.
+					map = workspace:GetAttribute("APIMap")
+					-- Store map in plugin.
+					plugin:SetSetting("APIMap", map) -- Map is already encoded btw.
+					plugin:SetSetting("APIMapVersion", mapVersion)
 					-- Decode and return map.
-					return HttpService:JSONDecode(map) :: APIMap
+					return HttpService:JSONDecode(workspace:GetAttribute("APIMap"))
+				else
+					-- Grab the map from plugin storage.
+					map = plugin:GetSetting("APIMap")
+					if map then
+						-- Store map in current place.
+						workspace:SetAttribute("APIMap", map)
+						workspace:SetAttribute("APIMapVersion", mapVersion)
+						-- Decode and return map.
+						return HttpService:JSONDecode(map)
+					else
+						-- Grab the map from current place storage.
+						map = workspace:GetAttribute("APIMap")
+						if map then
+							-- Store map in plugin.
+							plugin:SetSetting("APIMap", map) -- Map is already encoded btw.
+							plugin:SetSetting("APIMapVersion", mapVersion)
+							-- Decode and return map.
+							return HttpService:JSONDecode(workspace:GetAttribute("APIMap"))
+						end
+					end
 				end
 			end
 		end
-		return
+		
+		return nil
 	end
 	
 	-- Decode the API dump.
@@ -188,15 +212,17 @@ local function buildMap()
 		local properties = {}
 		
 		-- Gather superclasses.
-		local superClasses = {}
-		local superClass = rawMap[class.Superclass]
-		while superClass do
-			table.insert(superClasses, superClass)
-			superClass = rawMap[superClass.Superclass]
+		local superclasses = {}
+		local superclass = rawMap[class.Superclass]
+		local index = 1
+		while superclass do
+			superclasses[index] = superclass
+			superclass = rawMap[superclass.Superclass]
+			index += 1
 		end
 		-- Inherit properties from superclasses.
-		for index = #superClasses, 1, -1 do
-			local superClass = superClasses[index]
+		for index = #superclasses, 1, -1 do
+			local superClass = superclasses[index]
 			for _, member in superClass.Members do
 				if member.MemberType == "Property" then
 					properties[member.Name] = createProperty(member)
@@ -215,10 +241,14 @@ local function buildMap()
 		map[class.Name] = properties
 	end
 	
-	-- Cache map.
+	-- Store encoded map.
 	local encodedMap = HttpService:JSONEncode(map)
-	workspace:SetAttribute("APIMapCache", encodedMap)
-	if plugin then plugin:SetSetting("APIMapCache", encodedMap) end
+	workspace:SetAttribute("APIMap", encodedMap)
+	workspace:SetAttribute("APIMapVersion", mapVersion)
+	if plugin then
+		plugin:SetSetting("APIMap", encodedMap)
+		plugin:SetSetting("APIMapVersion", mapVersion)
+	end
 	
 	-- Let copies of this library know that we're no longer building.
 	workspace:SetAttribute("APIMapBuilding", nil)
@@ -229,35 +259,52 @@ end
 
 -- Retrieve/build and return map.
 if plugin then -- Plugin context.
-	local StudioService = game:GetService("StudioService")
-	
 	if RunService:IsRunning() then
 		-- Grab, decode and return map from current place cache.
 		return HttpService:JSONDecode(workspace:GetAttribute("APIMapCache")) :: APIMap
-	elseif not StudioService:GetAttribute("APIMapCache") then
-		-- Mark the current session as "has built"
-		StudioService:SetAttribute("APIMapCache", true)
-		-- Build and return map.
-		return buildMap() :: APIMap
 	else
-		local map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache
-		if map then
+		if workspace:GetAttribute("APIMapVersion") == mapVersion then
+			-- Grab the map from current place storage.
+			map = workspace:GetAttribute("APIMap")
+			-- Store map in plugin.
+			plugin:SetSetting("APIMap", map) -- Map is already encoded btw.
+			plugin:SetSetting("APIMapVersion", mapVersion)
 			-- Decode and return map.
 			return HttpService:JSONDecode(map) :: APIMap
 		else
-			if workspace:GetAttribute("APIMapBuilding") then
-				-- A copy of this library is building the map, so we wait for it to finish.
-				workspace:GetAttributeChangedSignal("APIMapCache"):Wait()
-				
-				-- Grab the map from current place cache.
-				map = workspace:GetAttribute("APIMapCache")
-				-- Cache the map in plugin.
-				plugin:SetSetting("APIMapCache", map) -- APIMap is already encoded btw.
+			-- Grab the map from plugin storage.
+			if plugin:GetSetting("APIMapVersion") == mapVersion then
+				-- Grab the map from plugin storage.
+				map = plugin:GetSetting("APIMap")
+				-- Store the map in current place.
+				if not workspace:GetAttribute("APIMapBuilding") then
+					workspace:SetAttribute("APIMap", map) -- Map is already encoded btw.
+					workspace:SetAttribute("APIMapVersion", mapVersion)
+				end
 				-- Decode and return map.
 				return HttpService:JSONDecode(map) :: APIMap
 			else
-				-- Build and return map.
-				return buildMap() :: APIMap
+				if workspace:GetAttribute("APIMapBuilding") then
+					-- A copy of this library is building the map, so we wait for it to finish.
+					workspace:GetAttributeChangedSignal("APIMap"):Wait()
+					
+					-- Grab the map from current place storage.
+					if workspace:GetAttribute("APIMapVersion") == mapVersion then
+						-- Grab the map from current place storage.
+						map = workspace:GetAttribute("APIMap")
+						-- Store map in plugin.
+						plugin:SetSetting("APIMap", map) -- Map is already encoded btw.
+						plugin:SetSetting("APIMapVersion", mapVersion)
+						-- Decode and return map.
+						return HttpService:JSONDecode(map) :: APIMap
+					else
+						-- Build and return map.
+						return buildMap() :: APIMap
+					end
+				else
+					-- Build and return map.
+					return buildMap() :: APIMap
+				end
 			end
 		end
 	end
@@ -269,19 +316,14 @@ else -- Game context.
 	packets = require(packets)
 	
 	if RunService:IsClient() then
+		-- Request the server for the map.
 		map = packets.GetAPIMap:Fire()
-	else
-		-- Get map.
-		local map = nil
-		if RunService:IsStudio() then
-			map = workspace:GetAttribute("APIMapCache") -- Grab the map from current place cache.
-			if map then
-				-- Decode map.
-				map = HttpService:JSONDecode(map)
-			else
-				-- Build map.
-				map = buildMap()
-			end
+	else -- Server context.
+		-- Retrieve or build map.
+		local map
+		if workspace:GetAttribute("APIMapVersion") == mapVersion then
+			-- Grab and decode map.
+			map = HttpService:JSONDecode(workspace:GetAttribute("APIMap"))
 		else
 			-- Build map.
 			map = buildMap()
