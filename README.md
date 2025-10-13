@@ -21,27 +21,27 @@ Inxpect allows you to easily inspect what was otherwise hidden.
 <br>
 
 # ✨ Fast, easy, smart.
-It's super efficient, easy-to-use, and has full plugin support.
+It’s super efficient, easy-to-use, and has full plugin support.
 
 It will intelligently communicate with copies of itself from other plugins, ensuring<br>
 only 1 script does the hard job, and that multiple identical maps never coexist.
 
-If an already up-to-date map is found in cache, it won't generate a new one.
+If an already up-to-date map is found in cache, it won’t generate a new one.
 
 In plugins, it even partially works offline and while the game is running.<br>
 This is possible due to its intelligent caching.
 
 *Note that the first time, you *have* to use it with internet connection,<br>
-and it's also not gauranteed to be fully up-to-date when using offline.*
+and it’s also not gauranteed to be fully up-to-date when using offline.*
 <br>
 
-Additionally, the syntax can't get any simpler!
+Additionally, the syntax can’t get any simpler!
 ```luau
 local apiMap = require(script.APIMap) -- Inxpect is named 'APIMap' — since that makes sense.
 ```
 <br>
 
-Don't worry, it provides only what's important:
+Don’t worry, it provides only what’s important:
 ```luau
 local apiMap = require(script.APIMap) :: {
 	-- Classes.
@@ -65,7 +65,7 @@ local apiMap = require(script.APIMap) -- 'APIMap' is Inxpect.
 local function printProperties(class)
 	local properties = apiMap[class]
 	
-	local output = class.."'s properties:"
+	local output = class.."’s properties:"
 	for name, data in properties do
 		output ..=
 			"\n\n    Name: "..name..
@@ -80,7 +80,7 @@ printProperties("Part")
 <summary>💡 See output</summary>
 
 ```
-Part's properties:
+Part’s properties:
 
     Name: RightParamB
     Type: number
