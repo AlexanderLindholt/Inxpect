@@ -21,7 +21,7 @@
                                                                           =====                     
                                                                             =====                   
                                                                              ===                    
-v1.6.0
+v1.6.1
 
 A super easy and efficient API map builder for Roblox,
 with plugin support and smart cross-communication.
@@ -259,6 +259,10 @@ end
 
 -- Retrieve/build and return map.
 if plugin then -- Plugin context.
+	plugin.Unloading:Connect(function()
+		workspace:SetAttribute("APIMapBuilding", nil)
+	end)
+	
 	if RunService:IsRunning() then
 		-- Grab, decode and return map from current place cache.
 		return HttpService:JSONDecode(workspace:GetAttribute("APIMapCache")) :: APIMap
