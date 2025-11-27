@@ -1,4 +1,11 @@
 <div align="center">
+<em>As of a recent Roblox update, the information that Inxpect helps you gather, is now a built-in feature on Roblox. As a result, Inxpect has been archived, and it is now recommended that you use the official ReflectionService as a replacement.</em>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 <img src="./Logo.png"></img>
 
