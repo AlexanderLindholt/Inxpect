@@ -1,11 +1,11 @@
 <div align="center">
-<em>As of a recent Roblox update, the information that Inxpect helps you gather, is now a built-in feature on Roblox. As a result, Inxpect has been archived, and it is now recommended that you use the official <a href="https://devforum.roblox.com/t/4078522">ReflectionService</a> as a replacement.</em>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<h1>Inxpect has been archived</h1>
+As of a recent Roblox update, the information that Inxpect helps you gather, is now a built-in feature on Roblox. As a result, Inxpect has been archived, and it is now recommended that you use the official <a href="https://devforum.roblox.com/t/4078522">ReflectionService</a> as a replacement.
+<br><br>
+Inxpect remains functional, but is no longer necessary.
+<br><br><br><br>
+<hr>
+<br><br>
 
 <img src="./Logo.png"></img>
 
@@ -13,11 +13,10 @@
 A super easy and efficient API map builder for Roblox,<br>
 with plugin support and smart cross-communication.
 
-[<img src="https://raw.githubusercontent.com/AlexanderLindholt/LinkButtons/refs/heads/main/Static/Module.png"></img>](https://create.roblox.com/store/asset/136538514747004) ​ [<img src="https://raw.githubusercontent.com/AlexanderLindholt/LinkButtons/refs/heads/main/Static/Devforum.png"></img>](https://devforum.roblox.com/t/3799622)
+[<img src="https://raw.githubusercontent.com/AlexanderLindholt/LinkButtons/refs/heads/main/Module.png"></img>](https://create.roblox.com/store/asset/136538514747004) ​ [<img src="https://raw.githubusercontent.com/AlexanderLindholt/LinkButtons/refs/heads/main/DevForum.png"></img>](https://devforum.roblox.com/t/3799622)
+
 </div>
-<br>
-​<br>
-<br>
+<br><br><br>
 
 #  🥷 The hidden Roblox API
 On Roblox there is no built-in way to view the API<br>
